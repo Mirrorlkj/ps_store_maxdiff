@@ -1,0 +1,18 @@
+---
+title: "correlation"
+author: "mirror"
+date: "2024-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(readxl)
+results <- read_excel("PS_Store_Recommendations_MaxDiff_Results.xlsx")
+```
+
+```{r}
+mydata.cor = cor(res)
+```
+
