@@ -9,10 +9,55 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(readxl)
-results <- read_excel("PS_Store_Recommendations_MaxDiff_Results.xlsx")
+library(dplyr)
+library(Hmisc)
+library(corrplot)
+library(dendextend)
+library(ggplot2)
+
 ```
 
 ```{r}
-mydata.cor = cor(res)
+results <- read_excel("PS_Store_Recommendations_MaxDiff_Results.xlsx")
+results_only <- results%>%
+    select(-1, -2)
+
+names(results_only) <- sub("\\|.*", "", names(results_only))
+names(results_only) <- sub(", e.g..*", "", names(results_only))
+    
+```
+
+```{r correlation}
+results_cor = cor(results_only)
+pdf("corrplot.pdf", width = 12, height = 12)
+corrplot(results_cor, order = "hclust", tl.cex = 0.6, tl.col = "black")
+```
+
+```{r cluster}
+
+dend <- t(results_only) %>%  scale %>% 
+        dist %>% hclust %>% as.dendrogram
+dend %>% plot
+
+```
+```{r}
+dend2 <- t(results_only)%>% scale %>% dist %>% 
+   hclust %>% as.dendrogram %>%
+   set("branches_k_color", k=10) %>% 
+    set("branches_lwd", 0.7) %>%
+    set("labels_cex", c(0.6)) 
+
+ggd1 <- as.ggdend(dend2)
+
+
+ggplot(ggd1, horiz = TRUE)+  # Use coord_flip to make dendrogram horizontal
+  theme_minimal()+
+     labs(subtitle = "Rescaled Distance",
+       x = "",
+       y = "")+
+     theme(plot.subtitle = element_text(hjust = 0.5))
+
+ggsave("dendro.pdf", width = 17, height = 12)
+    
 ```
 
